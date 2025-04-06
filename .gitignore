@@ -1,0 +1,10 @@
+# STM32CubeIDE 
+*.launch 
+*.log 
+*.o 
+*.elf 
+/Debug/ 
+/Release/ 
+.settings/ 
+.cproject 
+.project 

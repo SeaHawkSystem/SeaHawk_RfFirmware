@@ -1,0 +1,22 @@
+#ifndef __TASK_H__
+#define __TASK_H__
+
+#include "cmsis_os.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Task 함수 선언
+void StartDefaultTask(void *argument);
+void StartHC12SendTask(void *argument);
+
+// Task 속성 선언
+extern const osThreadAttr_t defaultTask_attributes;
+extern const osThreadAttr_t HC12SendTask_attributes;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __TASK_H__ */

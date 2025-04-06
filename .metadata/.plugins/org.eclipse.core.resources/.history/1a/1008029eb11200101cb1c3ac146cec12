@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <string.h>
+//#include "FreeRTOS.h"
+#include "task.h"
+//#include "queue.h"
+#include "main.h"
+
+uint8_t rx_buffer[sizeof(uint32_t)];
+extern osMessageQueueId_t uartQueueHandle;
+
+const osThreadAttr_t uartTask_attributes = {
+  .name = "UARTTask",
+  .stack_size = 128*4,
+  .priority=osPriorityNormal,
+};
+
+const osThreadAttr_t hc12comserialTask_attributes = {
+  .name = "HC12ComSERIALTask",
+  .stack_size = 128*4,
+  .priority=osPriorityNormal,
+};
+
+void systemTaskInit(void)
+{
+  xTaskCreate(StartHC12SendTask, "HC12SendTask", 128, NULL, tskIDLE_PRIORITY + 1, &hc12SendTaskHandle);
+  // UARTTask 생성
+  xTaskCreate(UARTTask,           // 태스크 함수
+              "UARTTask",         // 태스크 이름 (디버깅용)
+              128,                // 스택 크기 (워드 단위)
+              NULL,               // 인자
+              tskIDLE_PRIORITY + 1, // 우선순위
+              NULL);              // 태스크 핸들 (필요 없으면 NULL)
+
+  // HC12ComSERIALTask 생성
+  xTaskCreate(HC12ComSERIALTask,
+              "HC12ComSERIALTask",
+              128,
+              NULL,
+              tskIDLE_PRIORITY + 1,
+              NULL);
+}
+
+void UARTTask(void *argument)
+{
+    uint32_t msg;
+    char txBuffer[32];
+
+    for (;;)
+    {
+        if (osMessageQueueGet(uartQueueHandle, &msg, NULL, osWaitForever) == osOK)
+        {
+            sprintf(txBuffer, "Received: %lu\r\n", msg);
+            HAL_UART_Transmit(&husart3, (uint8_t *)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
+        }
+    }
+}
+
+void HC12ComSERIALTask(void *argument)
+{
+    for (;;)
+    {
+        printf("HC-12 TASK\r\n");
+        osDelay(1000);
+    }
+}

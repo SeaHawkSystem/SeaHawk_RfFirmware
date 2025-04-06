@@ -64,8 +64,8 @@ all: main-build
 main-build: HC12_FreeRTOS_Send.elf secondary-outputs
 
 # Tool invocations
-HC12_FreeRTOS_Send.elf HC12_FreeRTOS_Send.map: $(OBJS) $(USER_OBJS) C:\Users\user\Desktop\LIG_SW\githubRepo\STM32_\CortexM7\STM32H723G\HC12_FreeRTOS_Send\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "HC12_FreeRTOS_Send.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\user\Desktop\LIG_SW\githubRepo\STM32_\CortexM7\STM32H723G\HC12_FreeRTOS_Send\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="HC12_FreeRTOS_Send.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+HC12_FreeRTOS_Send.elf HC12_FreeRTOS_Send.map: $(OBJS) $(USER_OBJS) C:\Users\user\Desktop\LIG_SW\githubRepo\SeaHawk_RfFirmware\HC12_FreeRTOS_Send\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "HC12_FreeRTOS_Send.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\user\Desktop\LIG_SW\githubRepo\SeaHawk_RfFirmware\HC12_FreeRTOS_Send\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="HC12_FreeRTOS_Send.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

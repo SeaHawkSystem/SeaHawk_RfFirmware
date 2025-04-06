@@ -1,0 +1,10 @@
+#ifndef __TASK_H__
+#define __TASK_H__
+
+#include "stm32f4xx_hal.h"
+#include "FreeRTOS.h"
+
+void SystemTaskInit(void);
+extern UART_HandleTypeDef huart3;
+
+#endif /* __TASK_H__ */

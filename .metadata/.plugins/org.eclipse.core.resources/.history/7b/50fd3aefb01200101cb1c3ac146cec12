@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+//#include "FreeRTOS.h"
+#include "task.h"
+//#include "queue.h"
+#include "main.h"
+
+
+// 외부에서 접근할 수 있도록 핸들 선언
+extern UART_HandleTypeDef husart3;
+extern osMessageQueueId_t uartQueueHandle;
+extern uint8_t rx_buffer[];
+
+void UARTTask(void *argument)
+{
+    uint32_t msg;
+    char txBuffer[32];
+
+    for (;;)
+    {
+        if (osMessageQueueGet(uartQueueHandle, &msg, NULL, osWaitForever) == osOK)
+        {
+            sprintf(txBuffer, "Received: %lu\r\n", msg);
+            HAL_UART_Transmit(&husart3, (uint8_t *)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
+        }
+    }
+}
+
+void HC12ComSERIALTask(void *argument)
+{
+    for (;;)
+    {
+        printf("HC-12 TASK\r\n");
+        osDelay(1000);
+    }
+}

@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+//#include "FreeRTOS.h"
+#include "task.h"
+//#include "queue.h"
+#include "main.h"
+
+//osMessageQueueId_t uartQueueHandle;
+//extern UART_HandleTypeDef husart3;
+
+void UARTTask(void *argument);
+void HC12ComSERIALTask(void *argument);
+
+void systemTaskInit(void)
+{
+  // UARTTask 생성
+  xTaskCreate(UARTTask,
+              "UARTTask",
+              128,
+              NULL,
+              tskIDLE_PRIORITY + 1,
+              NULL);
+
+  // HC12ComSERIALTask 생성
+  xTaskCreate(HC12ComSERIALTask,
+              "HC12ComSERIALTask",
+              128,
+              NULL,
+              tskIDLE_PRIORITY + 1,
+              NULL);
+}
+
+void UARTTask(void *argument)
+{
+    uint32_t msg;
+    char txBuffer[32];
+
+    for (;;)
+    {
+        if (osMessageQueueGet(uartQueueHandle, &msg, NULL, osWaitForever) == osOK)
+        {
+            sprintf(txBuffer, "Received: %lu\r\n", msg);
+            HAL_UART_Transmit(&husart3, (uint8_t *)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
+        }
+    }
+}
+
+void HC12ComSERIALTask(void *argument)
+{
+    for (;;)
+    {
+        printf("HC-12 TASK\r\n");
+        osDelay(1000);
+    }
+}

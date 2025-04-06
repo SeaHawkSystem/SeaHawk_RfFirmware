@@ -1,0 +1,3 @@
+../Core/Src/task.c:18:6:systemTaskInit	16	static
+../Core/Src/task.c:45:6:UARTTask	56	static
+../Core/Src/task.c:60:6:HC12ComSERIALTask	16	static

@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
+#include "queue.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,21 +58,8 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* USER CODE BEGIN PV */
 UART_HandleTypeDef husart3;
-uint8_t rx_buffer[sizeof(uint32_t)];	// 수신 버퍼
-osMessageQueueId_t uartQueueHandle;
-
-
-const osThreadAttr_t uartTask_attributes = {
-  .name = "UARTTask",
-  .stack_size = 128*4,
-  .priority=osPriorityNormal,
-};
-
-const osThreadAttr_t hc12comserialTask_attributes = {
-  .name = "HC12ComSERIALTask",
-  .stack_size = 128*4,
-  .priority=osPriorityNormal,
-};
+extern osMessageQueueId_t uartQueueHandle;
+uint8_t rx_buffer[sizeof(uint32_t)];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,6 +77,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void UARTTask(void *);
 void HC12ComSERIALTask(void *);
 
+void systemTaskInit(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -134,9 +123,6 @@ int main(void)
   uartQueueHandle = osMessageQueueNew(UART_QUEUE_SIZE, sizeof(uint32_t), NULL);
 
   HAL_UART_Receive_IT(&huart7, rx_buffer, sizeof(uint32_t));
-
-
-
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -161,11 +147,9 @@ int main(void)
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  osThreadNew(UARTTask, NULL, &uartTask_attributes);
-  osThreadNew(HC12ComSERIALTask, NULL, &hc12comserialTask_attributes);
+  systemTaskInit();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -405,40 +389,21 @@ int _write(int file, char*ptr, int len)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == UART7)
-	{
-		uint32_t received_value;
-		memcpy(&received_value, rx_buffer, sizeof(received_value));
+    if (huart->Instance == UART7)
+    {
+        uint32_t received_value;
+        memcpy(&received_value, rx_buffer, sizeof(received_value));
 
-		osMessageQueuePut(uartQueueHandle, &received_value, 0, 0);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-		HAL_UART_Receive_IT(&huart7, rx_buffer, sizeof(received_value));
-	}
+        xQueueSendFromISR(uartQueueHandle, &received_value, &xHigherPriorityTaskWoken);
+
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+        HAL_UART_Receive_IT(&huart7, rx_buffer, sizeof(received_value));
+    }
 }
 
-void UARTTask(void *argument)
-{
-	uint32_t msg;
-	char txBuffer[32];
-
-	for(;;)
-	{
-		if(osMessageQueueGet(uartQueueHandle, &msg, NULL, osWaitForever) == osOK)
-		{
-			sprintf(txBuffer, "Received: %lu\r\n", msg);
-			HAL_UART_Transmit(&husart3, (uint8_t*)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
-		}
-	}
-}
-
-void HC12ComSERIALTask(void* argument)
-{
-	for(;;)
-	{
-		printf("HC-12 TASK\r\n");
-		osDelay(1000);
-	}
-}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */

@@ -1,0 +1,14 @@
+#ifndef __TASK_H__
+#define __TASK_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void SystemTaskInit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __TASK_H__ */

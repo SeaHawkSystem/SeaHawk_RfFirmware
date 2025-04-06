@@ -53,13 +53,6 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for HC12SendTask */
-osThreadId_t HC12SendTaskHandle;
-const osThreadAttr_t HC12SendTask_attributes = {
-  .name = "HC12SendTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
 /* USER CODE BEGIN PV */
 char txData[50];
 /* USER CODE END PV */
@@ -71,10 +64,9 @@ static void MX_GPIO_Init(void);
 static void MX_UART7_Init(void);
 static void MX_USART3_UART_Init(void);
 void StartDefaultTask(void *argument);
-void StartHC12SendTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-void sendData(int);
+void systemTaskInit(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -143,11 +135,9 @@ int main(void)
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of HC12SendTask */
-  HC12SendTaskHandle = osThreadNew(StartHC12SendTask, NULL, &HC12SendTask_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  systemTaskInit();
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -374,12 +364,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void sendData(int cnt)
-{
-	char txBuffer[20];
-	sprintf(txBuffer, "%d\r\n", cnt);
-	HAL_UART_Transmit(&huart7, (uint8_t*)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
-}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -389,7 +374,7 @@ void sendData(int cnt)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+__weak void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -398,27 +383,6 @@ void StartDefaultTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartHC12SendTask */
-/**
-* @brief Function implementing the HC12SendTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartHC12SendTask */
-void StartHC12SendTask(void *argument)
-{
-  /* USER CODE BEGIN StartHC12SendTask */
-  /* Infinite loop */
-	uint32_t count=0;
-  for(;;)
-  {
-	  sendData(count);
-	  ++count;
-    osDelay(1000);
-  }
-  /* USER CODE END StartHC12SendTask */
 }
 
  /* MPU Configuration */

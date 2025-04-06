@@ -1,0 +1,3 @@
+../Core/Src/task.c:15:6:systemTaskInit	1
+../Core/Src/task.c:20:6:sendData	1
+../Core/Src/task.c:28:6:StartHC12SendTask	1

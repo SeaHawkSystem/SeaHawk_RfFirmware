@@ -6,6 +6,7 @@
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32h7xx.o"
+"./Core/Src/task.o"
 "./Core/Startup/startup_stm32h723zgtx.o"
 "./Drivers/BSP/STM32H7xx_Nucleo/stm32h7xx_nucleo.o"
 "./Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o"

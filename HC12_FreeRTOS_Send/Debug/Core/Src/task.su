@@ -1,0 +1,3 @@
+../Core/Src/task.c:15:6:systemTaskInit	16	static
+../Core/Src/task.c:20:6:sendData	40	static
+../Core/Src/task.c:28:6:StartHC12SendTask	24	static

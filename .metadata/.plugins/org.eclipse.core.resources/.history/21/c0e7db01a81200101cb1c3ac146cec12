@@ -1,0 +1,54 @@
+#include "task.h"
+#include "cmsis_os2.h"
+#include "stm32h7xx_hal.h"
+#include <stdio.h>
+#include <string.h>
+
+extern UART_HandleTypeDef huart7;
+extern UART_HandleTypeDef huart3;
+
+// Task 함수 정의
+void StartDefaultTask(void *argument)
+{
+  for(;;)
+  {
+    osDelay(1);
+  }
+}
+
+void sendData(uint32_t cnt)
+{
+  char txBuffer[32];
+  sprintf(txBuffer, "Count: %lu\r\n", cnt);
+  HAL_UART_Transmit(&huart3, (uint8_t*)txBuffer, strlen(txBuffer), HAL_MAX_DELAY);
+}
+
+void StartHC12SendTask(void *argument)
+{
+  uint32_t count = 0;
+  for(;;)
+  {
+    sendData(count++);
+    osDelay(1000);
+  }
+}
+
+// Task 속성 정의
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = osPriorityNormal,
+};
+
+const osThreadAttr_t HC12SendTask_attributes = {
+  .name = "HC12SendTask",
+  .stack_size = 128 * 4,
+  .priority = osPriorityNormal,
+};
+
+// ⭐ Task 생성 함수
+void SystemTaskInit(void)
+{
+  osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  osThreadNew(StartHC12SendTask, NULL, &HC12SendTask_attributes);
+}
