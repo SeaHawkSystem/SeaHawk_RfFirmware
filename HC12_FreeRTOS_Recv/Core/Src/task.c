@@ -11,17 +11,14 @@ QueueHandle_t uartQueueHandle; // FreeRTOS용 큐 핸들
 
 extern UART_HandleTypeDef husart3;
 
-// 태스크 함수 선언
 void UARTTask(void *argument);
 void HC12ComSERIALTask(void *argument);
 
 void systemTaskInit(void)
 {
-  // 큐 생성 (필요한 메시지 크기와 길이에 맞게 조정)
   uartQueueHandle = xQueueCreate(10, sizeof(uint32_t));
   if (uartQueueHandle == NULL)
   {
-    // 큐 생성 실패 처리
     Error_Handler();
   }
 
@@ -62,6 +59,6 @@ void HC12ComSERIALTask(void *argument)
     for (;;)
     {
         printf("HC-12 TASK\r\n");
-        vTaskDelay(pdMS_TO_TICKS(1000)); // FreeRTOS 딜레이 함수
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
